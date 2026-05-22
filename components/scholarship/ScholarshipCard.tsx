@@ -14,7 +14,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { StatusBadge, ScholarshipStatus } from "./Statusbadge"
+import { StatusBadge, ScholarshipStatus } from "@/components/shared/StatusBadge"
 import { CalendarDays, RefreshCw, Pencil, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 

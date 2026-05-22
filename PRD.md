@@ -109,7 +109,85 @@ Scholarship alerts / email reminders · Letter of recommendation drafts
 | Styling | Tailwind CSS + shadcn/ui |
 | Hosting | Vercel |
 
-## 7. Data Model
+## 7. Project Structure
+
+The repo uses Next.js App Router with the project root as the app root (no `src/`).
+Keep this layout consistent — it's the map for where new code goes.
+
+```
+applyr/
+├── app/                          # Next.js App Router — routes & API
+│   ├── layout.tsx                # root layout: <html>/<body>, fonts, providers only
+│   ├── page.tsx                  # landing page
+│   ├── globals.css
+│   ├── auth/                     # literal /auth/* segment (proxy.ts depends on this path)
+│   │   ├── layout.tsx            #   auth-only layout — no sidebar  (to add)
+│   │   ├── login/page.tsx
+│   │   └── signup/page.tsx
+│   ├── (app)/                    # route group — shared sidebar layout, no URL segment  (to add)
+│   │   ├── layout.tsx            #   renders <AppLayout> once
+│   │   ├── dashboard/page.tsx
+│   │   ├── scholarships/
+│   │   │   ├── page.tsx          #   browse  (PRD calls this "Find Scholarships")
+│   │   │   └── [id]/essay/page.tsx
+│   │   ├── my-scholarships/page.tsx
+│   │   ├── experiences/page.tsx
+│   │   └── profile/setup/page.tsx
+│   └── api/                      # route handlers — Claude-backed endpoints  (to add)
+│       ├── experiences/extract/route.ts
+│       ├── scholarships/match/route.ts
+│       └── essays/{generate,refine}/route.ts
+│
+├── components/
+│   ├── ui/                       # shadcn primitives — lowercase filenames (shadcn convention)
+│   ├── layout/                   # app shell:  AppLayout.tsx, Sidebar.tsx
+│   ├── shared/                   # cross-feature components:  StatusBadge.tsx
+│   ├── scholarship/              # ScholarshipCard.tsx, AddScholarshipModal.tsx
+│   ├── experience/               # StarInterview.tsx, ExperienceCard.tsx  (to add)
+│   └── essay/                    # EssayEditor.tsx  (to add)
+│
+├── lib/
+│   ├── supabase/
+│   │   ├── client.ts             # createClient() — browser
+│   │   └── server.ts             # createServerSupabaseClient() — server components
+│   ├── anthropic.ts              # Claude client + prompt helpers  (to add)
+│   └── utils.ts                  # cn() and shared helpers
+│
+├── types/
+│   └── database.ts               # TS types for the 7 tables  (to add)
+│
+├── hooks/                        # custom React hooks (aliased @/hooks)  (to add)
+│
+├── supabase/                     # SQL kept in version control  (to add)
+│   ├── schema.sql                # the 7-table schema
+│   └── seed.sql                  # scholarship INSERTs
+│
+├── public/                       # static assets
+├── proxy.ts                      # auth middleware (this Next.js version renamed
+│                                 #   `middleware` → `proxy`; export is `proxy`)
+├── components.json               # shadcn config
+├── PRD.md  ·  Applyr.txt          # product docs
+└── AGENTS.md / CLAUDE.md          # agent instructions
+```
+
+**Conventions**
+
+- **Component files:** PascalCase with word boundaries — `ScholarshipCard.tsx`, not
+  `Scholarshipcard.tsx`. The lowercase files in `components/ui/` are a deliberate
+  shadcn exception; don't follow that style for your own components.
+- **Component folders:** organize by role (`layout`, `shared`) and by feature
+  (`scholarship`, `experience`, `essay`) — not one catch-all folder.
+- **Imports:** always use the `@/*` path alias (e.g. `@/components/shared/StatusBadge`),
+  never deep relative paths.
+- **Auth routing:** `/auth/*` is a literal path segment because [proxy.ts](proxy.ts)
+  matches on it. Do not move auth pages into a `(auth)` route group — that would
+  drop the `/auth` prefix and break the middleware redirect logic.
+- **App routing:** authenticated pages live under the `(app)` route group so they
+  share the sidebar layout while keeping clean URLs (`/dashboard`, not `/app/dashboard`).
+- **`(to add)`** markers above are directories/files the MVP needs but that don't
+  exist yet — create them as the corresponding milestone work begins.
+
+## 8. Data Model
 
 Seven core tables. Supabase Auth handles authentication; `users` stores profile
 metadata auth doesn't cover.
@@ -133,7 +211,7 @@ metadata auth doesn't cover.
 **Relationships:** `users` → `profiles` (1:1), `experiences` (1:many),
 `applications` (1:many) → `essays` (1:many), and `scholarships` (1:many, custom only).
 
-## 8. Milestones
+## 9. Milestones
 
 | Week | Focus | Deliverables |
 |---|---|---|
@@ -142,7 +220,7 @@ metadata auth doesn't cover.
 | 3 (May 26–Jun 1) | Essay Generation | Generate & refine APIs, essay editor, essay versioning, dashboard, My Scholarships page, Add Custom Scholarship modal, Experiences list. Full-journey walkthrough |
 | 4 (Jun 2–8) | Polish & Beta | Loading states, error handling + toasts, mobile responsiveness (375px), empty states, logo/favicon, live smoke test, 10-student beta + 3 screen-share sessions |
 
-## 9. Success Metrics (Beta)
+## 10. Success Metrics (Beta)
 
 - Students complete the full flow: signup → profile → matches → essay draft.
 - Beta feedback on three questions: what was confusing, would you use this weekly,
