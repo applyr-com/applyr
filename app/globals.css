@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
+/* removed @import "shadcn/tailwind.css" — not a real npm package, styles handled by tailwindcss import above */
 
 @custom-variant dark (&:is(.dark *));
 
