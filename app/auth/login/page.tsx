@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
   const router = useRouter()
+  const supabase = createClient()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -13,7 +14,6 @@ export default function LoginPage() {
   async function handleLogin() {
     setLoading(true)
     setError('')
-    const supabase = createClient()
     const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
     if (loginError) { setError(loginError.message); setLoading(false); return }
     router.push('/dashboard')
